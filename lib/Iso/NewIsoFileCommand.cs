@@ -40,9 +40,11 @@ namespace PsDiscUtils.Iso
 
         protected override void ProcessRecord()
         {
-            CDBuilder builder = new CDBuilder();
-            builder.UseJoliet = UseJoliet.IsPresent;
-            builder.VolumeIdentifier = string.IsNullOrWhiteSpace(VolumeIdentifier) ? "NewIso" : VolumeIdentifier;
+            CDBuilder builder = new CDBuilder
+            {
+                UseJoliet = UseJoliet.IsPresent,
+                VolumeIdentifier = string.IsNullOrWhiteSpace(VolumeIdentifier) ? "NewIso" : VolumeIdentifier
+            };
             foreach (var item in Path)
             {
                 bool isDir = (File.GetAttributes(item) & FileAttributes.Directory) == FileAttributes.Directory;
