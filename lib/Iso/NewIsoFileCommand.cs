@@ -28,7 +28,7 @@ namespace PsDiscUtils.Iso
         public string VolumeIdentifier { get; set; }
 
         [Parameter()]
-        SwitchParameter UseJoliet { get; set; }
+        public SwitchParameter UseJoliet { get; set; }
 
         [Parameter()]
         public string BootFile { get; set; }
