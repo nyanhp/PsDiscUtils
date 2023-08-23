@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PsDiscUtils.Iso
 {
-    [Cmdlet(VerbsCommon.New, "IsoFile")]
+    [Cmdlet(VerbsCommon.New, "PDUIsoFile")]
     [OutputType(typeof(FileInfo))]
     public class NewIsoFileCommand : PSCmdlet
     {

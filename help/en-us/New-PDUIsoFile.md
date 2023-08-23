@@ -5,7 +5,7 @@ online version:
 schema: 2.0.0
 ---
 
-# New-IsoFile
+# New-PDUIsoFile
 
 ## SYNOPSIS
 Create ISO files
@@ -13,7 +13,7 @@ Create ISO files
 ## SYNTAX
 
 ```
-New-IsoFile [[-Path] <String[]>] [-DestinationPath] <String> [-VolumeIdentifier <String>] [-BootFile <String>]
+New-PDUIsoFile [[-Path] <String[]>] [-DestinationPath] <String> [-VolumeIdentifier <String>] [-BootFile <String>]
  [-BootLoadSegment <Int32>] [-BootDeviceEmulation <BootDeviceEmulation>] [<CommonParameters>]
 ```
 
@@ -24,7 +24,7 @@ Create (bootable) ISO files using a list of paths. Folders are added as-is
 
 ### Example 1
 ```powershell
-PS C:\> Get-ChildItem ./customiso | New-IsoFile -DestinationPath C:\tmp\someiso.iso -BootFile C:\Windows\Boot\DVD\EFI\en-US\efisys.bin
+PS C:\> Get-ChildItem ./customiso | New-PDUIsoFile -DestinationPath C:\tmp\someiso.iso -BootFile C:\Windows\Boot\DVD\EFI\en-US\efisys.bin
 ```
 
 Creates new bootable ISO file from the content of ./customiso
