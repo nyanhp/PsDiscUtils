@@ -68,7 +68,7 @@ if ($AutoVersion)
 	}
 
 	[Version]$remoteModuleVersion = $remoteVersion -replace '-\w+'
-	[string]$prerelease = $remoteVersion -replace '[\d\.]+-'
+	[string]$prerelease = $remoteVersion -replace '[\d\.]+-?'
 	if ($prerelease)
 	{
 		$null = $prerelease -match '\d+'
