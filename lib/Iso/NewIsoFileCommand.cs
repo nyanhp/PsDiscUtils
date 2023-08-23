@@ -38,30 +38,39 @@ namespace PsDiscUtils.Iso
         [Parameter()]
         public BootDeviceEmulation BootDeviceEmulation = BootDeviceEmulation.NoEmulation;
 
-        protected override void ProcessRecord()
+        private CDBuilder _builder;
+
+        protected override void BeginProcessing()
         {
-            CDBuilder builder = new CDBuilder
+            _builder = new CDBuilder
             {
                 UseJoliet = UseJoliet.IsPresent,
                 VolumeIdentifier = string.IsNullOrWhiteSpace(VolumeIdentifier) ? "NewIso" : VolumeIdentifier
             };
+        }
+
+        protected override void ProcessRecord()
+        {
             foreach (var item in Path)
             {
                 bool isDir = (File.GetAttributes(item) & FileAttributes.Directory) == FileAttributes.Directory;
                 if (isDir)
                 {
-                    builder.AddDirectory(item);
+                    _builder.AddDirectory(item);
                     continue;
                 }
-                builder.AddFile(new FileInfo(item).Name, item);
+                _builder.AddFile(new FileInfo(item).Name, item);
             }
 
             if (!string.IsNullOrWhiteSpace(BootFile))
             {
-                builder.SetBootImage(new FileStream(BootFile, FileMode.Open, FileAccess.Read), BootDeviceEmulation, BootLoadSegment);
+                _builder.SetBootImage(new FileStream(BootFile, FileMode.Open, FileAccess.Read), BootDeviceEmulation, BootLoadSegment);
             }
+        }
 
-            builder.Build(DestinationPath);
+        protected override void EndProcessing()
+        {
+            _builder.Build(DestinationPath);
             WriteObject(new FileInfo(DestinationPath));
         }
     }
