@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using System.Management.Automation.Language;
 using System.Management.Automation.Runspaces;
 using System.Text;
 
@@ -53,10 +54,13 @@ namespace PsDiscUtils.Iso
         {
             foreach (var item in Path)
             {
-                bool isDir = (File.GetAttributes(item) & FileAttributes.Directory) == FileAttributes.Directory;
-                if (isDir)
+                if ((File.GetAttributes(item) & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    _builder.AddDirectory(item);
+                    var folder = new DirectoryInfo(item);
+                    foreach (var file in folder.GetFiles("*", SearchOption.AllDirectories))
+                    {
+                        _builder.AddFile(file.FullName.Replace(folder.Parent.FullName, string.Empty), file.FullName);
+                    }
                     continue;
                 }
                 _builder.AddFile(new FileInfo(item).Name, item);
