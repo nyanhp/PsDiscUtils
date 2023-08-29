@@ -65,15 +65,15 @@ namespace PsDiscUtils.Iso
                 }
                 _builder.AddFile(new FileInfo(item).Name, item);
             }
-
-            if (!string.IsNullOrWhiteSpace(BootFile))
-            {
-                _builder.SetBootImage(new FileStream(BootFile, FileMode.Open, FileAccess.Read), BootDeviceEmulation, BootLoadSegment);
-            }
         }
 
         protected override void EndProcessing()
         {
+            if (!string.IsNullOrWhiteSpace(BootFile))
+            {
+                _builder.SetBootImage(new FileStream(BootFile, FileMode.Open, FileAccess.Read), BootDeviceEmulation, BootLoadSegment);
+            }
+
             _builder.Build(DestinationPath);
             WriteObject(new FileInfo(DestinationPath));
         }
