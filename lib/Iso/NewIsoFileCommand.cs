@@ -8,7 +8,7 @@ using System.Text;
 
 namespace PsDiscUtils.Iso
 {
-    [Cmdlet(VerbsCommon.New, "PDUIsoFile")]
+    [Cmdlet(VerbsCommon.New, "PDUIsoFile", DefaultParameterSetName = "bootfile")]
     [OutputType(typeof(FileInfo))]
     public class NewIsoFileCommand : PSCmdlet
     {
@@ -16,28 +16,50 @@ namespace PsDiscUtils.Iso
         [Parameter(
             Position = 0,
             ValueFromPipelineByPropertyName = true,
-            ValueFromPipeline = true)]
+            ValueFromPipeline = true,
+            ParameterSetName = "bootfile")]
+        [Parameter(
+            Position = 0,
+            ValueFromPipelineByPropertyName = true,
+            ValueFromPipeline = true,
+            ParameterSetName = "bootiso")]
         public string[] Path { get; set; }
 
         [Parameter(
             Mandatory = true,
-            Position = 1)]
+            Position = 1,
+            ParameterSetName = "bootfile")]
+        [Parameter(
+            Mandatory = true,
+            Position = 1,
+            ParameterSetName = "bootiso")]
         public string DestinationPath { get; set; }
 
-        [Parameter()]
+        [Parameter(ParameterSetName = "bootfile")]
+        [Parameter(ParameterSetName = "bootiso")]
         public string VolumeIdentifier { get; set; }
 
-        [Parameter()]
+        [Parameter(ParameterSetName = "bootfile")]
+        [Parameter(ParameterSetName = "bootiso")]
         public SwitchParameter UseJoliet { get; set; }
 
-        [Parameter()]
+        [Parameter(ParameterSetName = "bootfile")]
         public string BootFile { get; set; }
 
-        [Parameter()]
+        [Parameter(ParameterSetName = "bootiso")]
+        public string ReferenceBootableIso { get; set; }
+
+        [Parameter(ParameterSetName = "bootfile")]
+        [Parameter(ParameterSetName = "bootiso")]
         public int BootLoadSegment = 0;
 
-        [Parameter()]
+        [Parameter(ParameterSetName = "bootfile")]
+        [Parameter(ParameterSetName = "bootiso")]
         public BootDeviceEmulation BootDeviceEmulation = BootDeviceEmulation.NoEmulation;
+
+        [Parameter(ParameterSetName = "bootfile")]
+        [Parameter(ParameterSetName = "bootiso")]
+        public SwitchParameter UpdateIsolinuxBootTable;
 
         private CDBuilder _builder;
 
@@ -69,9 +91,40 @@ namespace PsDiscUtils.Iso
 
         protected override void EndProcessing()
         {
-            if (!string.IsNullOrWhiteSpace(BootFile))
+            switch (ParameterSetName)
             {
-                _builder.SetBootImage(new FileStream(BootFile, FileMode.Open, FileAccess.Read), BootDeviceEmulation, BootLoadSegment);
+                case "bootfile":
+                    {
+                        if (!string.IsNullOrWhiteSpace(BootFile))
+                        {
+                            using (var fs = new FileStream(BootFile, FileMode.Open, FileAccess.Read))
+                            {
+                                _builder.SetBootImage(fs, BootDeviceEmulation, BootLoadSegment);
+                                _builder.Build(DestinationPath);
+                            }
+                        };
+
+                        WriteObject(new FileInfo(DestinationPath));
+                        return;
+                    }
+                case "bootiso":
+                    {
+                        if (!string.IsNullOrWhiteSpace(ReferenceBootableIso))
+                        {
+                            using (var fs = new FileStream(ReferenceBootableIso, FileMode.Open, FileAccess.Read))
+                            {
+                                using (var reader = new CDReader(fs, UseJoliet))
+                                {
+                                    _builder.SetBootImage(reader.OpenBootImage(), BootDeviceEmulation, BootLoadSegment);
+                                    _builder.UpdateIsolinuxBootTable = UpdateIsolinuxBootTable.IsPresent;
+                                    _builder.Build(DestinationPath);
+                                }
+                            }
+                        }
+
+                        WriteObject(new FileInfo(DestinationPath));
+                        return;
+                    }
             }
 
             _builder.Build(DestinationPath);
