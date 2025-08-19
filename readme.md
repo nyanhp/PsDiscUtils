@@ -1,4 +1,6 @@
-﻿# PsDiscUtils
+>This repo has moved to <https://codeberg.org/nyanhp/psdiscutils>
+ 
+ # PsDiscUtils
 
 PowerShell module that aims to implement the DiscUtils library.
 
